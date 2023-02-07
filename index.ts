@@ -8,7 +8,7 @@ dotenv.config();
 const apolloServer = new ApolloServer({
   schema,
 });
-
+const port: any = process.env.PORT || 4000;
 startStandaloneServer(apolloServer, {
-  listen: { port: 4000 },
+  listen: { port },
 }).then((engine) => console.log(`Server ready at: ${engine?.url}`));
