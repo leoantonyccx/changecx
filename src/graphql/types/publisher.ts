@@ -47,34 +47,37 @@ export const getPublisher = extendType({
   },
 });
 
-export const addPublisher = extendType({
-  type: "Mutation",
-  definition(t) {
-    t.field("addPublisher", {
-      type: "Publishers",
-      args: {
-        name: nonNull(stringArg()),
-      },
-      async resolve(_root, args) {
-        const existingPublisher = await prisma.publishers.findUnique({
-          where: {
-            id: args.id,
-          },
-        });
+// export const addPublisher = extendType({
+//   type: "Mutation",
+//   definition(t) {
+//     t.field("addPublisher", {
+//       type: "Publishers",
+//       args: {
+//         name: nonNull(stringArg()),
+//       },
+//       async resolve(_root, args) {
+//         // const existingPublisher = await prisma.publishers.findUnique({
+//         //   where: {
+//         //     id: args.id,
+//         //   },
+//         // });
 
-        if (!existingPublisher) {
-          return await prisma.publishers
-            .create({
-              data: {
-                name: args.name,
-              },
-            })
-            .catch(prismaErr);
-        }
-      },
-    });
-  },
-});
+//         // if (!existingPublisher) {
+//         return await prisma.publishers
+//           .upsert({
+//             where :{
+//               name : args.name
+//             },
+//             data: {
+//               name: args.name,
+//             },
+//           })
+//           .catch(prismaErr);
+//         // }
+//       },
+//     });
+//   },
+// });
 
 export const editPublisher = extendType({
   type: "Mutation",
@@ -92,7 +95,7 @@ export const editPublisher = extendType({
               id: args.id,
             },
             data: {
-              name: args.name,
+              name: args.name ?? "",
             },
           })
           .catch(prismaErr);

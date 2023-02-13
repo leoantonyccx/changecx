@@ -18,7 +18,7 @@ model Employee {
   photo          String?
   password       String
   role           String?
-  isManager      Boolean?
+  isManager      Boolean          
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   employeeSkills EmployeeSkills[]
@@ -29,7 +29,7 @@ model EmployeeSkills {
   employee      Employee           @relation(fields: [employeeId], references: [id])
   employeeId    String
   skill         CategoriesOnSkills @relation(fields: [skillId], references: [id])
-  skillId       String             @unique
+  skillId       String             
   certificate   Certificates?                     
   level         String
   updateLog     Json[]

@@ -59,11 +59,19 @@ export interface NexusGenObjects {
     updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
   }
   Employee: { // root type
+    accessToken?: string | null; // String
     createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
+    department?: string | null; // String
+    displayName?: string | null; // String
+    division?: string | null; // String
     email?: string | null; // String
     employeeSkills?: Array<NexusGenRootTypes['EmployeeSkills'] | null> | null; // [EmployeeSkills]
     id?: string | null; // String
     isManager?: boolean | null; // Boolean
+    jobTitle?: string | null; // String
+    location?: string | null; // String
+    manager?: string | null; // String
+    mobileNumber?: string | null; // String
     name?: string | null; // String
     photo?: string | null; // String
     role?: string | null; // String
@@ -139,11 +147,19 @@ export interface NexusGenFieldTypes {
     updatedAt: NexusGenScalars['DateTime'] | null; // DateTime
   }
   Employee: { // field return type
+    accessToken: string | null; // String
     createdAt: NexusGenScalars['DateTime'] | null; // DateTime
+    department: string | null; // String
+    displayName: string | null; // String
+    division: string | null; // String
     email: string | null; // String
     employeeSkills: Array<NexusGenRootTypes['EmployeeSkills'] | null> | null; // [EmployeeSkills]
     id: string | null; // String
     isManager: boolean | null; // Boolean
+    jobTitle: string | null; // String
+    location: string | null; // String
+    manager: string | null; // String
+    mobileNumber: string | null; // String
     name: string | null; // String
     photo: string | null; // String
     role: string | null; // String
@@ -166,11 +182,9 @@ export interface NexusGenFieldTypes {
     addCertificate: NexusGenRootTypes['Employee'] | null; // Employee
     addEmployee: NexusGenRootTypes['Employee'] | null; // Employee
     addEmployeeSkill: NexusGenRootTypes['Employee'] | null; // Employee
-    addPublisher: NexusGenRootTypes['Publishers'] | null; // Publishers
     addSkill: Array<NexusGenRootTypes['CategoriesOnSkills'] | null> | null; // [CategoriesOnSkills]
     deleteCategory: Array<NexusGenRootTypes['Categories'] | null> | null; // [Categories]
     deleteCertificate: NexusGenRootTypes['Certificates'] | null; // Certificates
-    deleteEmployee: NexusGenRootTypes['Employee'] | null; // Employee
     deleteEmployeeSkill: NexusGenRootTypes['Employee'] | null; // Employee
     deletePublisher: NexusGenRootTypes['Publishers'] | null; // Publishers
     deleteSkill: Array<NexusGenRootTypes['CategoriesOnSkills'] | null> | null; // [CategoriesOnSkills]
@@ -178,7 +192,7 @@ export interface NexusGenFieldTypes {
     editCertificate: NexusGenRootTypes['Certificates'] | null; // Certificates
     editEmployee: NexusGenRootTypes['Employee'] | null; // Employee
     editPublisher: NexusGenRootTypes['Publishers'] | null; // Publishers
-    editSkill: NexusGenRootTypes['Skills'] | null; // Skills
+    editSkill: Array<NexusGenRootTypes['CategoriesOnSkills'] | null> | null; // [CategoriesOnSkills]
     employeeLogin: NexusGenRootTypes['Employee'] | null; // Employee
   }
   Publishers: { // field return type
@@ -194,9 +208,6 @@ export interface NexusGenFieldTypes {
     certificate: NexusGenRootTypes['Certificates'] | null; // Certificates
     certificates: Array<NexusGenRootTypes['Certificates'] | null> | null; // [Certificates]
     cos: Array<NexusGenRootTypes['CategoriesOnSkills'] | null> | null; // [CategoriesOnSkills]
-    employee: NexusGenRootTypes['Employee'] | null; // Employee
-    employeeSkill: Array<NexusGenRootTypes['EmployeeSkills'] | null> | null; // [EmployeeSkills]
-    employeeSkills: Array<NexusGenRootTypes['EmployeeSkills'] | null> | null; // [EmployeeSkills]
     employees: Array<NexusGenRootTypes['Employee'] | null> | null; // [Employee]
     publisher: NexusGenRootTypes['Publishers'] | null; // Publishers
     publishers: Array<NexusGenRootTypes['Publishers'] | null> | null; // [Publishers]
@@ -248,11 +259,19 @@ export interface NexusGenFieldTypeNames {
     updatedAt: 'DateTime'
   }
   Employee: { // field return type name
+    accessToken: 'String'
     createdAt: 'DateTime'
+    department: 'String'
+    displayName: 'String'
+    division: 'String'
     email: 'String'
     employeeSkills: 'EmployeeSkills'
     id: 'String'
     isManager: 'Boolean'
+    jobTitle: 'String'
+    location: 'String'
+    manager: 'String'
+    mobileNumber: 'String'
     name: 'String'
     photo: 'String'
     role: 'String'
@@ -275,11 +294,9 @@ export interface NexusGenFieldTypeNames {
     addCertificate: 'Employee'
     addEmployee: 'Employee'
     addEmployeeSkill: 'Employee'
-    addPublisher: 'Publishers'
     addSkill: 'CategoriesOnSkills'
     deleteCategory: 'Categories'
     deleteCertificate: 'Certificates'
-    deleteEmployee: 'Employee'
     deleteEmployeeSkill: 'Employee'
     deletePublisher: 'Publishers'
     deleteSkill: 'CategoriesOnSkills'
@@ -287,7 +304,7 @@ export interface NexusGenFieldTypeNames {
     editCertificate: 'Certificates'
     editEmployee: 'Employee'
     editPublisher: 'Publishers'
-    editSkill: 'Skills'
+    editSkill: 'CategoriesOnSkills'
     employeeLogin: 'Employee'
   }
   Publishers: { // field return type name
@@ -303,9 +320,6 @@ export interface NexusGenFieldTypeNames {
     certificate: 'Certificates'
     certificates: 'Certificates'
     cos: 'CategoriesOnSkills'
-    employee: 'Employee'
-    employeeSkill: 'EmployeeSkills'
-    employeeSkills: 'EmployeeSkills'
     employees: 'Employee'
     publisher: 'Publishers'
     publishers: 'Publishers'
@@ -343,7 +357,7 @@ export interface NexusGenArgTypes {
     }
     addEmployee: { // args
       email: string; // String!
-      isManager?: string | null; // String
+      isManager?: boolean | null; // Boolean
       name: string; // String!
       password: string; // String!
       photo?: string | null; // String
@@ -354,9 +368,6 @@ export interface NexusGenArgTypes {
       employeeId: string; // String!
       level: string; // String!
     }
-    addPublisher: { // args
-      name: string; // String!
-    }
     addSkill: { // args
       categoryId: string; // String!
       name: string; // String!
@@ -365,9 +376,6 @@ export interface NexusGenArgTypes {
       id: string; // String!
     }
     deleteCertificate: { // args
-      id: string; // String!
-    }
-    deleteEmployee: { // args
       id: string; // String!
     }
     deleteEmployeeSkill: { // args
@@ -392,20 +400,18 @@ export interface NexusGenArgTypes {
     editEmployee: { // args
       email: string; // String!
       id: string; // String!
-      isManager?: string | null; // String
-      name?: string | null; // String
-      password?: string | null; // String
+      name: string; // String!
       photo?: string | null; // String
-      role?: string | null; // String
     }
     editPublisher: { // args
       id: string; // String!
       name?: string | null; // String
     }
     editSkill: { // args
-      categoryId?: string | null; // String
+      categoryId: string; // String!
       id: string; // String!
-      name?: string | null; // String
+      name: string; // String!
+      skillId: string; // String!
     }
     employeeLogin: { // args
       email: string; // String!
@@ -421,12 +427,6 @@ export interface NexusGenArgTypes {
     }
     cos: { // args
       skillId: string; // String!
-    }
-    employee: { // args
-      email: string; // String!
-    }
-    employeeSkill: { // args
-      employeeId: string; // String!
     }
     publisher: { // args
       id: string; // String!

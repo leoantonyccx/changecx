@@ -6,11 +6,14 @@ import {
   list,
   arg,
   inputObjectType,
+  booleanArg,
 } from "nexus";
 import { prismaErr } from "../prismaError";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import axios from "axios";
+import { XMLParser } from "fast-xml-parser";
 
 const prisma = new PrismaClient();
 
@@ -24,8 +27,16 @@ export const Employee = objectType({
     t.string("role");
     t.boolean("isManager");
     t.list.field("employeeSkills", { type: "EmployeeSkills" });
+    t.string("accessToken");
     t.field("createdAt", { type: "DateTime" });
     t.field("updatedAt", { type: "DateTime" });
+    t.string("displayName");
+    t.string("jobTitle");
+    t.string("mobileNumber");
+    t.string("department");
+    t.string("location");
+    t.string("division");
+    t.string("manager");
   },
 });
 
@@ -34,7 +45,7 @@ export const allEmployees = extendType({
   definition(t) {
     t.list.field("employees", {
       type: "Employee",
-      async resolve(_root, args, ctx) {
+      async resolve(_root, ctx) {
         return await prisma.employee.findMany({
           include: {
             employeeSkills: {
@@ -63,7 +74,7 @@ export const searchEmployee = extendType({
       args: {
         word: nonNull(stringArg()),
       },
-      async resolve(_root, args) {
+      async resolve(_root, args, ctx) {
         return await prisma.employee.findMany({
           where: {
             OR: [
@@ -184,39 +195,39 @@ export const searchEmployeeByCategory = extendType({
   },
 });
 
-export const getEmployee = extendType({
-  type: "Query",
-  definition(t) {
-    t.field("employee", {
-      type: "Employee",
-      args: {
-        email: nonNull(stringArg()),
-      },
-      async resolve(_root, args, ctx) {
-        return await prisma.employee
-          .findUnique({
-            where: {
-              email: args.email,
-            },
-            include: {
-              employeeSkills: {
-                include: {
-                  certificate: true,
-                  skill: {
-                    include: {
-                      skill: true,
-                      category: true,
-                    },
-                  },
-                },
-              },
-            },
-          })
-          .catch(prismaErr);
-      },
-    });
-  },
-});
+// export const getEmployee = extendType({
+//   type: "Query",
+//   definition(t) {
+//     t.field("employee", {
+//       type: "Employee",
+//       args: {
+//         email: nonNull(stringArg()),
+//       },
+//       async resolve(_root, args, ctx) {
+//         return await prisma.employee
+//           .findUnique({
+//             where: {
+//               email: args.email,
+//             },
+//             include: {
+//               employeeSkills: {
+//                 include: {
+//                   certificate: true,
+//                   skill: {
+//                     include: {
+//                       skill: true,
+//                       category: true,
+//                     },
+//                   },
+//                 },
+//               },
+//             },
+//           })
+//           .catch(prismaErr);
+//       },
+//     });
+//   },
+// });
 
 export const employeeLogin = extendType({
   type: "Mutation",
@@ -227,13 +238,13 @@ export const employeeLogin = extendType({
         email: nonNull(stringArg()),
         password: nonNull(stringArg()),
       },
-      async resolve(_root, args) {
-        const employee = await prisma.employee
+      async resolve(_root, args, ctx) {
+        const dbEmployee = await prisma.employee
           .findFirst({
             where: {
               AND: {
                 email: args.email,
-                password: args.name,
+                password: args.password,
               },
             },
             include: {
@@ -253,19 +264,49 @@ export const employeeLogin = extendType({
           .catch(prismaErr);
         // const pwVerify = await bcrypt.compare(args.password, employee.password);
 
-        if (employee) {
-          const accessToken = await jwt.sign(
-            { email: employee.email },
-            process.env.SECRET_TOKEN as string,
-            { expiresIn: "10m" }
+        if (dbEmployee) {
+          const { data } = await axios.get(
+            "https://44d4dec71a54a30986f0ea0a5ddf944ae84a58ec:x@api.bamboohr.com/api/gateway.php/changecx/v1/employees/directory"
           );
-
-          return {
-            ...employee,
-            accessToken,
+          const options = {
+            ignoreAttributes: true,
           };
+
+          const parser = new XMLParser(options);
+          let employees = parser.parse(data);
+
+          let existingEmployee =
+            employees?.directory?.employees?.employee?.find(
+              (e: any) => e?.field[6] === args.email
+            );
+
+          if (existingEmployee) {
+            const accessToken = jwt.sign(
+              { email: args.email },
+              process.env.SECRET_TOKEN as string,
+              { expiresIn: "10m" }
+            );
+
+            let employee = {
+              ...dbEmployee,
+              displayName: existingEmployee?.field[0],
+              jobTitle: existingEmployee?.field[4],
+              mobileNumber: existingEmployee?.field[5],
+              department: existingEmployee?.field[7],
+              location: existingEmployee?.field[8],
+              division: existingEmployee?.field[9],
+              manager: existingEmployee?.field[12],
+              photo: existingEmployee?.field[14],
+            };
+
+            return {
+              ...employee,
+              accessToken,
+            };
+          }
+          // else return "Invalid Credentials";
         }
-        // else return "Invalid Credentials";
+        return {};
       },
     });
   },
@@ -282,9 +323,9 @@ export const addEmployee = extendType({
         password: nonNull(stringArg()),
         photo: stringArg(),
         role: stringArg(),
-        isManager: stringArg(),
+        isManager: booleanArg(),
       },
-      async resolve(_root, args) {
+      async resolve(_root, args, ctx) {
         const existingEmployee = await prisma.employee.findUnique({
           where: {
             email: args.email,
@@ -295,7 +336,7 @@ export const addEmployee = extendType({
           // const salt = await bcrypt.genSalt(10);
           // const hash = await bcrypt.hash(args.password, salt);
 
-          const employee = await prisma.employee
+          const dbEmployee = await prisma.employee
             .create({
               data: {
                 name: args.name,
@@ -303,7 +344,7 @@ export const addEmployee = extendType({
                 password: args.password,
                 photo: args.photo,
                 role: args.role,
-                isManager: args.isManager,
+                isManager: args.isManager ?? false,
               },
               include: {
                 employeeSkills: {
@@ -321,17 +362,50 @@ export const addEmployee = extendType({
             })
             .catch(prismaErr);
 
-          const accessToken = await jwt.sign(
-            { email: employee.email },
-            process.env.SECRET_TOKEN as string,
-            { expiresIn: "10m" }
-          );
+          if (dbEmployee) {
+            const { data } = await axios.get(
+              "https://44d4dec71a54a30986f0ea0a5ddf944ae84a58ec:x@api.bamboohr.com/api/gateway.php/changecx/v1/employees/directory"
+            );
+            const options = {
+              ignoreAttributes: true,
+            };
 
-          return {
-            ...employee,
-            accessToken,
-          };
+            const parser = new XMLParser(options);
+            let employees = parser.parse(data);
+
+            let existingEmployee =
+              employees?.directory?.employees?.employee?.find(
+                (e: any) => e?.field[6] === args.email
+              );
+
+            if (existingEmployee) {
+              const accessToken = jwt.sign(
+                { email: args.email },
+                process.env.SECRET_TOKEN as string,
+                { expiresIn: "10m" }
+              );
+
+              let employee = {
+                ...dbEmployee,
+                displayName: existingEmployee?.field[0],
+                jobTitle: existingEmployee?.field[4],
+                mobileNumber: existingEmployee?.field[5],
+                department: existingEmployee?.field[7],
+                location: existingEmployee?.field[8],
+                division: existingEmployee?.field[9],
+                manager: existingEmployee?.field[12],
+                photo: existingEmployee?.field[14],
+              };
+
+              return {
+                ...employee,
+                accessToken,
+              };
+            }
+            // else return "Invalid Credentials";
+          }
         }
+        return {};
       },
     });
   },
@@ -344,28 +418,25 @@ export const editEmployee = extendType({
       type: "Employee",
       args: {
         id: nonNull(stringArg()),
-        name: stringArg(),
+        name: nonNull(stringArg()),
         email: nonNull(stringArg()),
-        password: stringArg(),
         photo: stringArg(),
-        role: stringArg(),
-        isManager: stringArg(),
       },
       async resolve(_root, args, ctx) {
-        // let { id, ...data } = args;
         await prisma.employee
           .update({
             where: {
               id: args.id,
             },
             data: {
-              ...args,
+              name: args.name ?? "",
+              photo: args.photo,
             },
           })
           .catch(prismaErr);
 
         return await prisma.employee
-          .findUniqueOrThrow({
+          .findUnique({
             where: {
               id: args.id,
             },
@@ -389,23 +460,23 @@ export const editEmployee = extendType({
   },
 });
 
-export const deleteEmployee = extendType({
-  type: "Mutation",
-  definition(t) {
-    t.field("deleteEmployee", {
-      type: "Employee",
-      args: {
-        id: nonNull(stringArg()),
-      },
-      async resolve(_root, args, ctx) {
-        return await prisma.employee
-          .delete({
-            where: {
-              id: args.id,
-            },
-          })
-          .catch(prismaErr);
-      },
-    });
-  },
-});
+// export const deleteEmployee = extendType({
+//   type: "Mutation",
+//   definition(t) {
+//     t.field("deleteEmployee", {
+//       type: "Employee",
+//       args: {
+//         id: nonNull(stringArg()),
+//       },
+//       async resolve(_root, args, ctx) {
+//         return await prisma.employee
+//           .delete({
+//             where: {
+//               id: args.id,
+//             },
+//           })
+//           .catch(prismaErr);
+//       },
+//     });
+//   },
+// });

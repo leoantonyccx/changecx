@@ -85,20 +85,20 @@ export const addCertificate = extendType({
         await prisma.certificates
           .upsert({
             where: {
-              employeeSkillId: args.employeeSkillId,
+              employeeSkillId: args.employeeSkillId ?? "",
             },
             update: {
               name: args.name,
               publisher: args.publisher,
               photo: args.photo,
-              expiry: args.expiry,
+              expiry: args.expiry ?? "",
             },
             create: {
               name: args.name,
               publisher: args.publisher,
               photo: args.photo,
-              expiry: args.expiry,
-              employeeSkillId: args.employeeSkillId,
+              expiry: args.expiry ?? "",
+              employeeSkillId: args.employeeSkillId ?? "",
             },
           })
           .catch(prismaErr);
@@ -118,7 +118,7 @@ export const addCertificate = extendType({
         return await prisma.employee
           .findUniqueOrThrow({
             where: {
-              id: args.employeeId,
+              id: args.employeeId ?? "",
             },
             include: {
               employeeSkills: {
@@ -156,7 +156,7 @@ export const editCertificate = extendType({
               id: args.id,
             },
             data: {
-              name: args.name,
+              name: args.name ?? "",
             },
           })
           .catch(prismaErr);

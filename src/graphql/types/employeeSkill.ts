@@ -27,56 +27,56 @@ enum LEVEL {
   ADVANCED,
 }
 
-export const allEmployeeSkills = extendType({
-  type: "Query",
-  definition(t) {
-    t.list.field("employeeSkills", {
-      type: "EmployeeSkills",
-      async resolve(_root, args) {
-        return await prisma.employeeSkills.findMany({
-          include: {
-            certificate: true,
-            skill: {
-              include: {
-                skill: true,
-                category: true,
-              },
-            },
-          },
-        });
-      },
-    });
-  },
-});
+// export const allEmployeeSkills = extendType({
+//   type: "Query",
+//   definition(t) {
+//     t.list.field("employeeSkills", {
+//       type: "EmployeeSkills",
+//       async resolve(_root, args, ctx) {
+//         return await prisma.employeeSkills.findMany({
+//           // include: {
+//           //   certificate: true,
+//           //   skill: {
+//           //     include: {
+//           //       skill: true,
+//           //       category: true,
+//           //     },
+//           //   },
+//           // },
+//         });
+//       },
+//     });
+//   },
+// });
 
-export const getEmployeeSkills = extendType({
-  type: "Query",
-  definition(t) {
-    t.list.field("employeeSkill", {
-      type: "EmployeeSkills",
-      args: {
-        employeeId: nonNull(stringArg()),
-      },
-      async resolve(_root, args) {
-        return await prisma.employeeSkills.findMany({
-          where: {
-            employeeId: args.employeeId,
-          },
-          include: {
-            certificate: true,
-            skill: {
-              include: {
-                skill: true,
-                category: true,
-              },
-            },
-            employee: true,
-          },
-        });
-      },
-    });
-  },
-});
+// export const getEmployeeSkills = extendType({
+//   type: "Query",
+//   definition(t) {
+//     t.list.field("employeeSkill", {
+//       type: "EmployeeSkills",
+//       args: {
+//         employeeId: nonNull(stringArg()),
+//       },
+//       async resolve(_root, args) {
+//         return await prisma.employeeSkills.findMany({
+//           where: {
+//             employeeId: args.employeeId,
+//           },
+//           include: {
+//             certificate: true,
+//             skill: {
+//               include: {
+//                 skill: true,
+//                 category: true,
+//               },
+//             },
+//             employee: true,
+//           },
+//         });
+//       },
+//     });
+//   },
+// });
 
 export const addEmployeeSkill = extendType({
   type: "Mutation",
@@ -88,7 +88,7 @@ export const addEmployeeSkill = extendType({
         coskillId: nonNull(stringArg()),
         level: nonNull(stringArg()),
       },
-      async resolve(_root, args) {
+      async resolve(_root, args, ctx) {
         // let existingSkill = await prisma.employeeSkills
         //   .findFirstOrThrow({
         //     where: {
@@ -98,7 +98,7 @@ export const addEmployeeSkill = extendType({
         //   .catch(prismaErr);
 
         // if (existingSkill == null) {
-        let es = await prisma.employeeSkills
+        await prisma.employeeSkills
           .create({
             data: {
               employeeId: args.employeeId,

@@ -25,7 +25,7 @@ export const allCOS = extendType({
   definition(t) {
     t.list.field("allCOS", {
       type: "CategoriesOnSkills",
-      async resolve(_root, args) {
+      async resolve(_root, args, ctx) {
         return await prisma.categoriesOnSkills
           .findMany({
             include: {
@@ -154,13 +154,13 @@ export const deleteSkill = extendType({
           },
         });
 
-        await prisma.skills
-          .delete({
-            where: {
-              id: args.id,
-            },
-          })
-          .catch(prismaErr);
+        // await prisma.skills
+        //   .delete({
+        //     where: {
+        //       id: args.id,
+        //     },
+        //   })
+        //   .catch(prismaErr);
 
         return await prisma.categoriesOnSkills
           .findMany({
@@ -207,6 +207,13 @@ export const searchSkill = extendType({
               },
             },
             include: {
+              employeeSkills: {
+                include: {
+                  certificate: true,
+                  skill: true,
+                  employee: true,
+                },
+              },
               category: true,
               skill: true,
             },

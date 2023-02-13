@@ -1,24 +1,12 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
-        "esModuleInterop": true,
-        "allowSyntheticDefaultImports": true,
-        "target": "es6",
-        "moduleResolution": "node",
         "sourceMap": true,
         "outDir": "dist",
-        "baseUrl": ".",
-        "paths": {
-            "*": [
-                "src/types/*"
-            ]
-        }
-    },
-    "include": [
-        "src/**/*"
-    ],
-    "exclude": [
-        "node_modules",
-        "**/*.spec.ts"
-    ]
+        "strict": true,
+        "lib": [
+            "esnext"
+        ],
+        "esModuleInterop": true,
+        "skipLibCheck": true
+    }
 }

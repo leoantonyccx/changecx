@@ -63,18 +63,19 @@ export const getSkill = extendType({
 export const editSkill = extendType({
   type: "Mutation",
   definition(t) {
-    t.field("editSkill", {
-      type: "Skills",
+    t.list.field("editSkill", {
+      type: "CategoriesOnSkills",
       args: {
         id: nonNull(stringArg()),
-        name: stringArg(),
-        categoryId: stringArg(),
+        name: nonNull(stringArg()),
+        categoryId: nonNull(stringArg()),
+        skillId: nonNull(stringArg()),
       },
-      async resolve(_root, args) {
-        const skill = await prisma.skills
+      async resolve(_root, args, ctx) {
+        await prisma.skills
           .update({
             where: {
-              id: args.id,
+              id: args.skillId,
             },
             data: {
               name: args.name,
@@ -82,13 +83,36 @@ export const editSkill = extendType({
           })
           .catch(prismaErr);
 
-        // await prisma.categoriesOnSkills.update({
-        //   where: {
-        //     skillId: args.id
-        //   }
-        // })
+        await prisma.categoriesOnSkills.update({
+          where: {
+            id: args.id,
+          },
+          data: {
+            skillId: args.skillId,
+            categoryId: args.categoryId,
+          },
+        });
 
-        return skill;
+        return await prisma.categoriesOnSkills
+          .findMany({
+            include: {
+              skill: true,
+              category: true,
+              employeeSkills: {
+                include: {
+                  certificate: true,
+                  employee: true,
+                  skill: {
+                    include: {
+                      category: true,
+                      skill: true,
+                    },
+                  },
+                },
+              },
+            },
+          })
+          .catch(prismaErr);
       },
     });
   },
