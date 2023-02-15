@@ -9,12 +9,12 @@ export const Certificates = objectType({
   definition(t) {
     t.string("id");
     t.string("name");
-    t.string("publisher");
+    t.field("publisher", { type: "Publishers" });
+    t.string("publisherId");
     t.string("expiry");
     t.string("photo");
     t.field("employeeSkill", { type: "EmployeeSkills" });
     t.string("employeeSkillId");
-    t.list.string("updateLog");
     t.field("createdAt", { type: "DateTime" });
     t.field("updatedAt", { type: "DateTime" });
   },
@@ -28,9 +28,10 @@ export const allCertificates = extendType({
       async resolve(_root, args, ctx) {
         return await prisma.certificates.findMany({
           include: {
+            publisher: true,
             employeeSkill: {
               include: {
-                certificate: true,
+                employee: true,
                 skill: {
                   include: {
                     skill: true,
@@ -75,30 +76,30 @@ export const addCertificate = extendType({
       args: {
         id: stringArg(),
         name: nonNull(stringArg()),
-        publisher: nonNull(stringArg()),
+        publisherId: nonNull(stringArg()),
         photo: nonNull(stringArg()),
         expiry: stringArg(),
-        employeeSkillId: stringArg(),
-        employeeId: stringArg(),
+        employeeSkillId: nonNull(stringArg()),
+        employeeId: nonNull(stringArg()),
       },
       async resolve(_root, args) {
         await prisma.certificates
           .upsert({
             where: {
-              employeeSkillId: args.employeeSkillId ?? "",
+              employeeSkillId: args.employeeSkillId,
             },
             update: {
               name: args.name,
-              publisher: args.publisher,
+              publisherId: args.publisherId,
               photo: args.photo,
               expiry: args.expiry ?? "",
             },
             create: {
               name: args.name,
-              publisher: args.publisher,
+              publisherId: args.publisherId,
               photo: args.photo,
               expiry: args.expiry ?? "",
-              employeeSkillId: args.employeeSkillId ?? "",
+              employeeSkillId: args.employeeSkillId,
             },
           })
           .catch(prismaErr);
@@ -123,7 +124,11 @@ export const addCertificate = extendType({
             include: {
               employeeSkills: {
                 include: {
-                  certificate: true,
+                  certificate: {
+                    include: {
+                      publisher: true,
+                    },
+                  },
                   skill: {
                     include: {
                       skill: true,
@@ -140,44 +145,72 @@ export const addCertificate = extendType({
   },
 });
 
-export const editCertificate = extendType({
-  type: "Mutation",
-  definition(t) {
-    t.field("editCertificate", {
-      type: "Certificates",
-      args: {
-        id: nonNull(stringArg()),
-        name: stringArg(),
-      },
-      async resolve(_root, args, ctx) {
-        return await prisma.certificates
-          .update({
-            where: {
-              id: args.id,
-            },
-            data: {
-              name: args.name ?? "",
-            },
-          })
-          .catch(prismaErr);
-      },
-    });
-  },
-});
+// export const editCertificate = extendType({
+//   type: "Mutation",
+//   definition(t) {
+//     t.field("editCertificate", {
+//       type: "Certificates",
+//       args: {
+//         id: nonNull(stringArg()),
+//         name: stringArg(),
+//         publisherId: stringArg(),
+//       },
+//       async resolve(_root, args, ctx) {
+//         return await prisma.certificates
+//           .update({
+//             where: {
+//               id: args.id,
+//             },
+//             data: {
+//               name: args.name ?? "",
+//               publisherId: args.publisherId,
+//             },
+//           })
+//           .catch(prismaErr);
+//       },
+//     });
+//   },
+// });
 
 export const deleteCertificate = extendType({
   type: "Mutation",
   definition(t) {
     t.field("deleteCertificate", {
-      type: "Certificates",
+      type: "Employee",
       args: {
         id: nonNull(stringArg()),
+        employeeId: nonNull(stringArg()),
       },
       async resolve(_root, args, ctx) {
-        return await prisma.certificates
+        await prisma.certificates
           .delete({
             where: {
               id: args.id,
+            },
+          })
+          .catch(prismaErr);
+
+        return await prisma.employee
+          .findUniqueOrThrow({
+            where: {
+              id: args.employeeId ?? "",
+            },
+            include: {
+              employeeSkills: {
+                include: {
+                  certificate: {
+                    include: {
+                      publisher: true,
+                    },
+                  },
+                  skill: {
+                    include: {
+                      skill: true,
+                      category: true,
+                    },
+                  },
+                },
+              },
             },
           })
           .catch(prismaErr);

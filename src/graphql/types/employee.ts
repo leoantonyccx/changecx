@@ -50,7 +50,11 @@ export const allEmployees = extendType({
           include: {
             employeeSkills: {
               include: {
-                certificate: true,
+                certificate: {
+                  include: {
+                    publisher: true,
+                  },
+                },
                 skill: {
                   include: {
                     category: true,
@@ -250,7 +254,11 @@ export const employeeLogin = extendType({
             include: {
               employeeSkills: {
                 include: {
-                  certificate: true,
+                  certificate: {
+                    include: {
+                      publisher: true,
+                    },
+                  },
                   skill: {
                     include: {
                       skill: true,
@@ -304,9 +312,7 @@ export const employeeLogin = extendType({
               accessToken,
             };
           }
-          // else return "Invalid Credentials";
         }
-        return {};
       },
     });
   },

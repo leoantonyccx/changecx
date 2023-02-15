@@ -29,8 +29,8 @@ type Certificates {
   id: String
   name: String
   photo: String
-  publisher: String
-  updateLog: [String]
+  publisher: Publishers
+  publisherId: String
   updatedAt: DateTime
 }
 
@@ -74,17 +74,17 @@ type EmployeeSkills {
 
 type Mutation {
   addCategory(id: String, name: String!): [Categories]
-  addCertificate(employeeId: String, employeeSkillId: String, expiry: String, id: String, name: String!, photo: String!, publisher: String!): Employee
+  addCertificate(employeeId: String!, employeeSkillId: String!, expiry: String, id: String, name: String!, photo: String!, publisherId: String!): Employee
   addEmployee(email: String!, isManager: Boolean, name: String!, password: String!, photo: String, role: String): Employee
   addEmployeeSkill(coskillId: String!, employeeId: String!, level: String!): Employee
+  addPublisher(id: String!, name: String!): [Publishers]
   addSkill(categoryId: String!, name: String!): [CategoriesOnSkills]
   deleteCategory(id: String!): [Categories]
-  deleteCertificate(id: String!): Certificates
+  deleteCertificate(employeeId: String!, id: String!): Employee
   deleteEmployeeSkill(employeeId: String!, eskillId: String!): Employee
   deletePublisher(id: String!): Publishers
   deleteSkill(coskillId: String!, id: String!): [CategoriesOnSkills]
   editCategory(id: String!, name: String): Categories
-  editCertificate(id: String!, name: String): Certificates
   editEmployee(email: String!, id: String!, name: String!, photo: String): Employee
   editPublisher(id: String!, name: String): Publishers
   editSkill(categoryId: String!, id: String!, name: String!, skillId: String!): [CategoriesOnSkills]
@@ -92,6 +92,7 @@ type Mutation {
 }
 
 type Publishers {
+  certificates: [Certificates]
   createdAt: DateTime
   id: String
   name: String
