@@ -82,11 +82,10 @@ type Mutation {
   deleteCategory(id: String!): [Categories]
   deleteCertificate(employeeId: String!, id: String!): Employee
   deleteEmployeeSkill(employeeId: String!, eskillId: String!): Employee
-  deletePublisher(id: String!): Publishers
+  deletePublisher(id: String!): [Publishers]
   deleteSkill(coskillId: String!, id: String!): [CategoriesOnSkills]
   editCategory(id: String!, name: String): Categories
   editEmployee(email: String!, id: String!, name: String!, photo: String): Employee
-  editPublisher(id: String!, name: String): Publishers
   editSkill(categoryId: String!, id: String!, name: String!, skillId: String!): [CategoriesOnSkills]
   employeeLogin(email: String!, password: String!): Employee
 }
@@ -103,13 +102,13 @@ type Query {
   allCOS: [CategoriesOnSkills]
   categories: [Categories]
   category(id: String!): Categories
-  certificate(id: String!): Certificates
   certificates: [Certificates]
   cos(skillId: String!): [CategoriesOnSkills]
   employees: [Employee]
-  publisher(id: String!): Publishers
   publishers: [Publishers]
   searchCategory(word: String!): [Categories]
+  searchCertificate(word: String!): [Certificates]
+  searchCertificateByPublisher(word: String!): [Certificates]
   searchEmployee(word: String!): [Employee]
   searchEmployeeByCategory(word: String!): [Employee]
   searchEmployeeBySkill(word: String!): [Employee]

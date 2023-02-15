@@ -27,27 +27,6 @@ export const allPublishers = extendType({
   },
 });
 
-export const getPublisher = extendType({
-  type: "Query",
-  definition(t) {
-    t.field("publisher", {
-      type: "Publishers",
-      args: {
-        id: nonNull(stringArg()),
-      },
-      async resolve(_root, args, ctx) {
-        return await prisma.publishers
-          .findUnique({
-            where: {
-              id: args.id,
-            },
-          })
-          .catch(prismaErr);
-      },
-    });
-  },
-});
-
 export const addPublisher = extendType({
   type: "Mutation",
   definition(t) {
@@ -77,47 +56,23 @@ export const addPublisher = extendType({
   },
 });
 
-export const editPublisher = extendType({
-  type: "Mutation",
-  definition(t) {
-    t.field("editPublisher", {
-      type: "Publishers",
-      args: {
-        id: nonNull(stringArg()),
-        name: stringArg(),
-      },
-      async resolve(_root, args, ctx) {
-        return await prisma.publishers
-          .update({
-            where: {
-              id: args.id,
-            },
-            data: {
-              name: args.name ?? "",
-            },
-          })
-          .catch(prismaErr);
-      },
-    });
-  },
-});
-
 export const deletePublisher = extendType({
   type: "Mutation",
   definition(t) {
-    t.field("deletePublisher", {
+    t.list.field("deletePublisher", {
       type: "Publishers",
       args: {
         id: nonNull(stringArg()),
       },
       async resolve(_root, args, ctx) {
-        return await prisma.publishers
+        await prisma.publishers
           .delete({
             where: {
               id: args.id,
             },
           })
           .catch(prismaErr);
+        return await prisma.publishers.findMany();
       },
     });
   },

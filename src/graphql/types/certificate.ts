@@ -47,27 +47,6 @@ export const allCertificates = extendType({
   },
 });
 
-export const getCertificate = extendType({
-  type: "Query",
-  definition(t) {
-    t.field("certificate", {
-      type: "Certificates",
-      args: {
-        id: nonNull(stringArg()),
-      },
-      async resolve(_root, args, ctx) {
-        return await prisma.certificates
-          .findUniqueOrThrow({
-            where: {
-              id: args.id,
-            },
-          })
-          .catch(prismaErr);
-      },
-    });
-  },
-});
-
 export const addCertificate = extendType({
   type: "Mutation",
   definition(t) {
@@ -104,18 +83,6 @@ export const addCertificate = extendType({
           })
           .catch(prismaErr);
 
-        // await prisma.certificates
-        //   .create({
-        //     data: {
-        //       name: args.name,
-        //       publisher: args.publisher,
-        //       photo: args.photo,
-        //       expiry: args.expiry,
-        //       employeeSkillId: args.employeeSkillId,
-        //     },
-        //   })
-        //   .catch(prismaErr);
-
         return await prisma.employee
           .findUniqueOrThrow({
             where: {
@@ -144,33 +111,6 @@ export const addCertificate = extendType({
     });
   },
 });
-
-// export const editCertificate = extendType({
-//   type: "Mutation",
-//   definition(t) {
-//     t.field("editCertificate", {
-//       type: "Certificates",
-//       args: {
-//         id: nonNull(stringArg()),
-//         name: stringArg(),
-//         publisherId: stringArg(),
-//       },
-//       async resolve(_root, args, ctx) {
-//         return await prisma.certificates
-//           .update({
-//             where: {
-//               id: args.id,
-//             },
-//             data: {
-//               name: args.name ?? "",
-//               publisherId: args.publisherId,
-//             },
-//           })
-//           .catch(prismaErr);
-//       },
-//     });
-//   },
-// });
 
 export const deleteCertificate = extendType({
   type: "Mutation",
@@ -203,6 +143,81 @@ export const deleteCertificate = extendType({
                       publisher: true,
                     },
                   },
+                  skill: {
+                    include: {
+                      skill: true,
+                      category: true,
+                    },
+                  },
+                },
+              },
+            },
+          })
+          .catch(prismaErr);
+      },
+    });
+  },
+});
+
+export const searchCertificate = extendType({
+  type: "Query",
+  definition(t) {
+    t.list.field("searchCertificate", {
+      type: "Certificates",
+      args: {
+        word: nonNull(stringArg()),
+      },
+      async resolve(_root, args) {
+        return await prisma.certificates
+          .findMany({
+            where: {
+              name: {
+                contains: args?.word ?? "",
+                mode: "insensitive",
+              },
+            },
+            include: {
+              publisher: true,
+              employeeSkill: {
+                include: {
+                  employee: true,
+                  skill: {
+                    include: {
+                      skill: true,
+                      category: true,
+                    },
+                  },
+                },
+              },
+            },
+          })
+          .catch(prismaErr);
+      },
+    });
+  },
+});
+
+export const searchCertificateByPublisher = extendType({
+  type: "Query",
+  definition(t) {
+    t.list.field("searchCertificateByPublisher", {
+      type: "Certificates",
+      args: {
+        word: nonNull(stringArg()),
+      },
+      async resolve(_root, args) {
+        return await prisma.certificates
+          .findMany({
+            where: {
+              publisher: {
+                name: args.word ?? "",
+              },
+            },
+            include: {
+              publisher: true,
+              employeeSkill: {
+                include: {
+                  employee: true,
                   skill: {
                     include: {
                       skill: true,

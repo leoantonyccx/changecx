@@ -188,11 +188,10 @@ export interface NexusGenFieldTypes {
     deleteCategory: Array<NexusGenRootTypes['Categories'] | null> | null; // [Categories]
     deleteCertificate: NexusGenRootTypes['Employee'] | null; // Employee
     deleteEmployeeSkill: NexusGenRootTypes['Employee'] | null; // Employee
-    deletePublisher: NexusGenRootTypes['Publishers'] | null; // Publishers
+    deletePublisher: Array<NexusGenRootTypes['Publishers'] | null> | null; // [Publishers]
     deleteSkill: Array<NexusGenRootTypes['CategoriesOnSkills'] | null> | null; // [CategoriesOnSkills]
     editCategory: NexusGenRootTypes['Categories'] | null; // Categories
     editEmployee: NexusGenRootTypes['Employee'] | null; // Employee
-    editPublisher: NexusGenRootTypes['Publishers'] | null; // Publishers
     editSkill: Array<NexusGenRootTypes['CategoriesOnSkills'] | null> | null; // [CategoriesOnSkills]
     employeeLogin: NexusGenRootTypes['Employee'] | null; // Employee
   }
@@ -207,13 +206,13 @@ export interface NexusGenFieldTypes {
     allCOS: Array<NexusGenRootTypes['CategoriesOnSkills'] | null> | null; // [CategoriesOnSkills]
     categories: Array<NexusGenRootTypes['Categories'] | null> | null; // [Categories]
     category: NexusGenRootTypes['Categories'] | null; // Categories
-    certificate: NexusGenRootTypes['Certificates'] | null; // Certificates
     certificates: Array<NexusGenRootTypes['Certificates'] | null> | null; // [Certificates]
     cos: Array<NexusGenRootTypes['CategoriesOnSkills'] | null> | null; // [CategoriesOnSkills]
     employees: Array<NexusGenRootTypes['Employee'] | null> | null; // [Employee]
-    publisher: NexusGenRootTypes['Publishers'] | null; // Publishers
     publishers: Array<NexusGenRootTypes['Publishers'] | null> | null; // [Publishers]
     searchCategory: Array<NexusGenRootTypes['Categories'] | null> | null; // [Categories]
+    searchCertificate: Array<NexusGenRootTypes['Certificates'] | null> | null; // [Certificates]
+    searchCertificateByPublisher: Array<NexusGenRootTypes['Certificates'] | null> | null; // [Certificates]
     searchEmployee: Array<NexusGenRootTypes['Employee'] | null> | null; // [Employee]
     searchEmployeeByCategory: Array<NexusGenRootTypes['Employee'] | null> | null; // [Employee]
     searchEmployeeBySkill: Array<NexusGenRootTypes['Employee'] | null> | null; // [Employee]
@@ -305,7 +304,6 @@ export interface NexusGenFieldTypeNames {
     deleteSkill: 'CategoriesOnSkills'
     editCategory: 'Categories'
     editEmployee: 'Employee'
-    editPublisher: 'Publishers'
     editSkill: 'CategoriesOnSkills'
     employeeLogin: 'Employee'
   }
@@ -320,13 +318,13 @@ export interface NexusGenFieldTypeNames {
     allCOS: 'CategoriesOnSkills'
     categories: 'Categories'
     category: 'Categories'
-    certificate: 'Certificates'
     certificates: 'Certificates'
     cos: 'CategoriesOnSkills'
     employees: 'Employee'
-    publisher: 'Publishers'
     publishers: 'Publishers'
     searchCategory: 'Categories'
+    searchCertificate: 'Certificates'
+    searchCertificateByPublisher: 'Certificates'
     searchEmployee: 'Employee'
     searchEmployeeByCategory: 'Employee'
     searchEmployeeBySkill: 'Employee'
@@ -407,10 +405,6 @@ export interface NexusGenArgTypes {
       name: string; // String!
       photo?: string | null; // String
     }
-    editPublisher: { // args
-      id: string; // String!
-      name?: string | null; // String
-    }
     editSkill: { // args
       categoryId: string; // String!
       id: string; // String!
@@ -426,16 +420,16 @@ export interface NexusGenArgTypes {
     category: { // args
       id: string; // String!
     }
-    certificate: { // args
-      id: string; // String!
-    }
     cos: { // args
       skillId: string; // String!
     }
-    publisher: { // args
-      id: string; // String!
-    }
     searchCategory: { // args
+      word: string; // String!
+    }
+    searchCertificate: { // args
+      word: string; // String!
+    }
+    searchCertificateByPublisher: { // args
       word: string; // String!
     }
     searchEmployee: { // args
