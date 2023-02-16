@@ -29,8 +29,8 @@ type Certificates {
   id: String
   name: String
   photo: String
-  publisher: String
-  updateLog: [String]
+  publisher: Publishers
+  publisherId: String
   updatedAt: DateTime
 }
 
@@ -40,11 +40,19 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 scalar DateTime
 
 type Employee {
+  accessToken: String
   createdAt: DateTime
+  department: String
+  displayName: String
+  division: String
   email: String
   employeeSkills: [EmployeeSkills]
   id: String
   isManager: Boolean
+  jobTitle: String
+  location: String
+  manager: String
+  mobileNumber: String
   name: String
   photo: String
   role: String
@@ -66,26 +74,24 @@ type EmployeeSkills {
 
 type Mutation {
   addCategory(id: String, name: String!): [Categories]
-  addCertificate(employeeId: String, employeeSkillId: String, expiry: String, id: String, name: String!, photo: String!, publisher: String!): Employee
-  addEmployee(email: String!, isManager: String, name: String!, password: String!, photo: String, role: String): Employee
+  addCertificate(employeeId: String!, employeeSkillId: String!, expiry: String, id: String, name: String!, photo: String!, publisherId: String!): Employee
+  addEmployee(email: String!, isManager: Boolean, name: String!, password: String!, photo: String, role: String): Employee
   addEmployeeSkill(coskillId: String!, employeeId: String!, level: String!): Employee
-  addPublisher(name: String!): Publishers
+  addPublisher(id: String!, name: String!): [Publishers]
   addSkill(categoryId: String!, name: String!): [CategoriesOnSkills]
   deleteCategory(id: String!): [Categories]
-  deleteCertificate(id: String!): Certificates
-  deleteEmployee(id: String!): Employee
+  deleteCertificate(employeeId: String!, id: String!): Employee
   deleteEmployeeSkill(employeeId: String!, eskillId: String!): Employee
-  deletePublisher(id: String!): Publishers
+  deletePublisher(id: String!): [Publishers]
   deleteSkill(coskillId: String!, id: String!): [CategoriesOnSkills]
   editCategory(id: String!, name: String): Categories
-  editCertificate(id: String!, name: String): Certificates
-  editEmployee(email: String!, id: String!, isManager: String, name: String, password: String, photo: String, role: String): Employee
-  editPublisher(id: String!, name: String): Publishers
-  editSkill(categoryId: String, id: String!, name: String): Skills
+  editEmployee(email: String!, id: String!, name: String!, photo: String): Employee
+  editSkill(categoryId: String!, id: String!, name: String!, skillId: String!): [CategoriesOnSkills]
   employeeLogin(email: String!, password: String!): Employee
 }
 
 type Publishers {
+  certificates: [Certificates]
   createdAt: DateTime
   id: String
   name: String
@@ -96,16 +102,13 @@ type Query {
   allCOS: [CategoriesOnSkills]
   categories: [Categories]
   category(id: String!): Categories
-  certificate(id: String!): Certificates
   certificates: [Certificates]
   cos(skillId: String!): [CategoriesOnSkills]
-  employee(email: String!): Employee
-  employeeSkill(employeeId: String!): [EmployeeSkills]
-  employeeSkills: [EmployeeSkills]
   employees: [Employee]
-  publisher(id: String!): Publishers
   publishers: [Publishers]
   searchCategory(word: String!): [Categories]
+  searchCertificate(word: String!): [Certificates]
+  searchCertificateByPublisher(word: String!): [Certificates]
   searchEmployee(word: String!): [Employee]
   searchEmployeeByCategory(word: String!): [Employee]
   searchEmployeeBySkill(word: String!): [Employee]

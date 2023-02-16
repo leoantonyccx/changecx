@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch"]
 }
 
@@ -18,23 +18,23 @@ model Employee {
   photo          String?
   password       String
   role           String?
-  isManager      Boolean?
+  isManager      Boolean
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   employeeSkills EmployeeSkills[]
 }
 
 model EmployeeSkills {
-  id            String             @id @default(uuid())
-  employee      Employee           @relation(fields: [employeeId], references: [id])
-  employeeId    String
-  skill         CategoriesOnSkills @relation(fields: [skillId], references: [id])
-  skillId       String             @unique
-  certificate   Certificates?                     
-  level         String
-  updateLog     Json[]
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
+  id          String             @id @default(uuid())
+  employee    Employee           @relation(fields: [employeeId], references: [id])
+  employeeId  String
+  skill       CategoriesOnSkills @relation(fields: [skillId], references: [id])
+  skillId     String
+  certificate Certificates?
+  level       String
+  updateLog   Json[]
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
 }
 
 model Skills {
@@ -65,21 +65,23 @@ model CategoriesOnSkills {
 }
 
 model Certificates {
-  id             String          @id @default(uuid())
-  name           String
-  publisher      String
-  expiry         String
-  photo          String
-  updateLog      Json[]
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  employeeSkill  EmployeeSkills  @relation(fields: [employeeSkillId], references: [id])
+  id              String         @id @default(uuid())
+  name            String
+  publisher       Publishers     @relation(fields: [publisherId], references: [id])
+  publisherId     String
+  expiry          String
+  photo           String
+  updateLog       Json[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  employeeSkill   EmployeeSkills @relation(fields: [employeeSkillId], references: [id])
   employeeSkillId String         @unique
 }
 
 model Publishers {
-  id        String   @id @default(uuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String         @id @default(uuid())
+  name         String         @unique
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  certificates Certificates[]
 }

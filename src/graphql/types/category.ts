@@ -102,7 +102,7 @@ export const addCategory = extendType({
         await prisma.categories
           .upsert({
             where: {
-              id: args.id,
+              id: args.id ?? "",
             },
             update: {
               name: args.name,
@@ -153,10 +153,10 @@ export const editCategory = extendType({
         return await prisma.categories
           .update({
             where: {
-              id: args.id,
+              id: args.id ?? "",
             },
             data: {
-              name: args.name,
+              name: args.name ?? "",
             },
           })
           .catch(prismaErr);
